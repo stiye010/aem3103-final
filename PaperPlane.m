@@ -45,6 +45,7 @@
 	figure
 	plot(xa(:,4),xa(:,3),xb(:,4),xb(:,3),xc(:,4),xc(:,3),xd(:,4),xd(:,3))
 	xlabel('Range, m'), ylabel('Height, m'), grid
+    legend('line #1')
 
 	figure
 	subplot(2,2,1)
