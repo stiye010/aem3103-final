@@ -3,7 +3,7 @@
 %	August 23, 2005
 	
 %	a) Equilibrium Glide at Maximum Lift/Drag Ratio
-    [V,Gam,H,R] = setup_sim();
+    [V,Gam,H,R] = setup_sim(); % sets up simulation
 	to		=	0;			% Initial Time, sec
 	tf		=	6;			% Final Time, sec
 	tspan	=	[to tf];
