@@ -47,15 +47,15 @@
         'Higher: Gam = 0.4 rad');
   
  % Second Part: Simultaneous random variations
-    V_range = [2:0.1:7.5];
-    Gam_range = [-0.5:0.1:0.4];
+    V_range = [2, 7.5];
+    Gam_range = [-0.5, 0.4];
     tspan = [0, 6];
     num_simulations = 100;
     trajectory_data = zeros(num_simulations, length(tspan)*100+1, 2);
     
     for i = 1:num_simulations
-        V = V_range(1) + (V_range(end) - V_range(1)) * rand(1);
-        Gam = Gam_range(1) + (Gam_range(end) - Gam_range(1)) * rand(1);
+        V = V_range(1) + (V_range(2) - V_range(1)) * rand(1);
+        Gam = Gam_range(1) + (Gam_range(2) - Gam_range(1)) * rand(1);
         [H, R] = setup_sim();
         xo = [V; Gam; H; R];
         [ta, xa] = ode23(@EqMotion, tspan, xo);
@@ -64,9 +64,9 @@
     
     figure;
     hold on; grid on;
-    gray = [0.7 0.7 0.7];
+    gray = [0.7 0.7]
     for i = 1:num_simulations
-        plot(trajectory_data(i, :, 1), trajectory_data(i, :, 2), 'Color', gray);
+        plot(trajectory_data(i, :, 1), trajectory_data(i, :, 2), 'greyColor', [rand(), rand(), rand()]);
     end
     title('Simulated Trajectories with Random Parameter Variations');
     xlabel('Range (m)');

@@ -1,7 +1,7 @@
   # Paper Airplane Numerical Study
   Final Project: AEM 3103 Spring 2024
 
-  - By: Benjamin Stiyer and Santiago
+  - By: Benjamin Stiyer and Santiago Velasquez
 
   ## Summary of Findings
   <Show the variations studied in a table>
