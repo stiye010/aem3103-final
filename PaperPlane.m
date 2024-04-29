@@ -1,7 +1,9 @@
 %	Example 1.3-1 Paper Airplane Flight Path
 %	Copyright 2005 by Robert Stengel
 %	August 23, 2005
-	
+	clear
+    clc
+    close all;
 %	a) Equilibrium Glide at Maximum Lift/Drag Ratio
     [V,Gam,H,R] = setup_sim(); % sets up simulation
 	to		=	0;			% Initial Time, sec
@@ -52,6 +54,9 @@
     tspan = [0:0.01:6];
     num_simulations = 100;
     trajectory_data = zeros(num_simulations, length(tspan), 2);
+    figure;
+    hold on; grid on;
+    gray = [0.7 0.7 0.7];
     
     for i = 1:num_simulations
         V = V_range(1) + (V_range(end) - V_range(1)) * rand(1);
@@ -59,15 +64,39 @@
         [H, R] = setup_sim();
         xo = [V; Gam; H; R];
         [ta, xa] = ode23(@EqMotion, tspan, xo);
-        trajectory_data(i, 1:length(ta), :) = [xa(:, 4), xa(:, 3)];
+        r_array = [xa(:,4)];
+        h_array = [xa(:,3)];
+        t_array = [ta];
+        plot(r_array,h_array, 'Color', gray);
     end
-    
-    figure;
-    hold on; grid on;
-    gray = [0.7 0.7 0.7];
-    for i = 1:num_simulations
-        plot(trajectory_data(i, :, 1), trajectory_data(i, :, 2), 'Color', gray);
-    end
+ 
     title('Simulated Trajectories with Random Parameter Variations');
     xlabel('Range (m)');
     ylabel('Height (m)');
+
+    % Curve fit
+    figure;
+
+    % Height v Time
+    subplot(1,2,1);
+    hold on;grid on;
+    plot(t_array,h_array,'-k');
+    p = polyfit(t_array,h_array,8);
+    h_fit = polyval(p, t_array); 
+    plot(t_array,h_fit, '-b','LineWidth',1);
+    title('Height vs Time');
+    xlabel('Time(s)'); ylabel('Height (m)');
+    legend('Actual', 'Curve Fit')
+
+    % Range v Time
+    subplot(1,2,2);
+    hold on;grid on;
+    plot(t_array,r_array,'-k');
+    p = polyfit(t_array,r_array,3);
+    r_fit = polyval(p, t_array); 
+    plot(t_array,r_fit, '-b','LineWidth',1);
+    title('Range vs Time');
+    xlabel('Time(s)'); ylabel('Range (m)');
+    legend('Actual', 'Curve Fit')
+
+disp (t_array)
