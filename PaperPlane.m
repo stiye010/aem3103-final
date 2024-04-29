@@ -49,9 +49,9 @@
  % Second Part: Simultaneous random variations
     V_range = [2:0.1:7.5];
     Gam_range = [-0.5:0.1:0.4];
-    tspan = [0, 6];
+    tspan = [0:0.01:6];
     num_simulations = 100;
-    trajectory_data = zeros(num_simulations, length(tspan)*100+1, 2);
+    trajectory_data = zeros(num_simulations, length(tspan), 2);
     
     for i = 1:num_simulations
         V = V_range(1) + (V_range(end) - V_range(1)) * rand(1);
