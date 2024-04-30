@@ -12,7 +12,7 @@
 	xo		=	[V;Gam;H;R];
 	[ta,xa]	=	ode23('EqMotion',tspan,xo);
 
-% First Part: Individually change V and Gam
+%% Part 1: Individually change V and Gam
 	figure
 	subplot(2,1,1)
     hold on;
@@ -47,53 +47,101 @@
     xlabel('Range (m)'), ylabel('Height (m)'), grid
     legend('Nominal: Gam = -0.18 rad','Lower: Gam = -0.5 rad', ...
         'Higher: Gam = 0.4 rad');
-  
- % Second Part: Simultaneous random variations
-V_range = [2:0.1:7.5];
-Gam_range = [-0.5:0.1:0.4];
-tspan = [0:0.01:6];
-num_simulations = 100;
-trajectory_data = zeros(num_simulations, length(tspan), 2);
 
-% Arrays to store all trajectories
-all_t_array = zeros(num_simulations, length(tspan));
-all_h_array = zeros(num_simulations, length(tspan));
-all_r_array = zeros(num_simulations, length(tspan));
-
-for i = 1:num_simulations
-    V = V_range(1) + (V_range(end) - V_range(1)) * rand(1);
-    Gam = Gam_range(1) + (Gam_range(end) - Gam_range(1)) * rand(1);
-    [H, R] = setup_sim();
-    xo = [V; Gam; H; R];
-    [ta, xa] = ode23(@EqMotion, tspan, xo);
-    r_array = xa(:,4);
-    h_array = xa(:,3);
-    t_array = ta;
+%% Animation
+    figure;
+    subplot(2,1,1);
+    hold on; grid on;
+    xlabel('Range (m)');
+    ylabel('Height (m)');
+    title('Height vs Range : Varying Initial Velocity Animation');
     
-    % Store trajectories
-    all_t_array(i, :) = t_array';
-    all_h_array(i, :) = h_array';
-    all_r_array(i, :) = r_array';
-end
+    V = 3.55;
+    xo = [V; Gam; H; R];
+    [ta_nominal, xa_nominal] = ode23('EqMotion', tspan, xo);
+    V = 7.5;
+    xo = [V; Gam; H; R];
+    [ta_scenario, xa_scenario] = ode23('EqMotion', tspan, xo);
+    h = animatedline('Color', 'k');
+    z = animatedline('Color', 'b');
 
-% Plot all height trajectories
-figure;
-hold on; grid on;
-for i = 1:num_simulations
-    plot(all_r_array(i,:), all_h_array(i,:), 'Color', [0.7 0.7 0.7]);
-end
-title('Simulated Height vs Range Trajectories');
-xlabel('Range (m)');
-ylabel('Height (m)');
+    for j = 1:length(tspan)
+        addpoints(h, xa_nominal(j,4), xa_nominal(j,3));
+        addpoints(z, xa_scenario(j,4), xa_scenario(j,3));
+        drawnow;
+        pause(0.001);
+        legend('Nominal: V = 3.55 m/s', 'Scenario: V = 7.5 m/s')
+    end
+    
+    subplot(2,1,2);
+    hold on; grid on;
+    xlabel('Range (m)');
+    ylabel('Height (m)');
+    title('Height vs Range : Varying Initial Flight Path Angle Animation');
 
-% Fit curve to all height trajectories
-p_h = polyfit(all_t_array(:), all_h_array(:), 8);
-h_fit = polyval(p_h, all_t_array(:));
+    Gam = -0.18;
+    xo = [V; Gam; H; R];
+    [ta_nominal_g, xa_nominal_g] = ode23('EqMotion', tspan, xo);
+    Gam = 0.4;
+    xo = [V; Gam; H; R];
+    [ta_scenario_g, xa_scenario_g] = ode23('EqMotion', tspan, xo);
+    w = animatedline('Color', 'k');
+    q = animatedline('Color', 'b');
 
-% Fit curve to all range trajectories
-p_r = polyfit(all_t_array(:), all_r_array(:), 3);
-r_fit = polyval(p_r, all_t_array(:));
+    for j = 1:length(tspan)
+        addpoints(w, xa_nominal_g(j,4), xa_nominal_g(j,3));
+        addpoints(q, xa_scenario_g(j,4), xa_scenario_g(j,3));
+        drawnow;
+        pause(0.001);
+        legend('Nominal: Gam = - 0.18 rad', 'Scenario: Gam = 0.4 rad');
+    end
 
-% Plot height and range curve fits
-plot(r_fit, h_fit, 'k', 'LineWidth', 2);
-legend('Simulated Trajectories', 'Height vs Range Curve Fit');
+%% Part 2 & 3: Simultaneous random variations and Curve fitting
+    V_range = [2:0.1:7.5];
+    Gam_range = [-0.5:0.1:0.4];
+    tspan = [0:0.01:6];
+    num_simulations = 100;
+    trajectory_data = zeros(num_simulations, length(tspan), 2);
+    
+    % Arrays to store all trajectories
+    all_t_array = zeros(num_simulations, length(tspan));
+    all_h_array = zeros(num_simulations, length(tspan));
+    all_r_array = zeros(num_simulations, length(tspan));
+    
+    for i = 1:num_simulations
+        V = V_range(1) + (V_range(end) - V_range(1)) * rand(1);
+        Gam = Gam_range(1) + (Gam_range(end) - Gam_range(1)) * rand(1);
+        [H, R] = setup_sim();
+        xo = [V; Gam; H; R];
+        [ta, xa] = ode23(@EqMotion, tspan, xo);
+        r_array = xa(:, 4);
+        h_array = xa(:, 3);
+        t_array = ta;
+        
+        % Store trajectories
+        all_t_array(i, :) = t_array';
+        all_h_array(i, :) = h_array';
+        all_r_array(i, :) = r_array';
+    end
+    
+    % Plot all height trajectories
+    figure;
+    hold on; grid on;
+    for i = 1:num_simulations
+        plot(all_r_array(i, :), all_h_array(i, :), 'Color', [0.7 0.7 0.7]);
+    end
+    title('Simulated Height vs Range Trajectories');
+    xlabel('Range (m)');
+    ylabel('Height (m)');
+    
+    % Fit curve to all height trajectories
+    p_h = polyfit(all_t_array(:), all_h_array(:), 8);
+    h_fit = polyval(p_h, all_t_array(:));
+    
+    % Fit curve to all range trajectories
+    p_r = polyfit(all_t_array(:), all_r_array(:), 3);
+    r_fit = polyval(p_r, all_t_array(:));
+    
+    % Plot height and range curve fits
+    plot(r_fit, h_fit, 'k', 'LineWidth', 2);
+    legend('Simulated Trajectories', 'Height vs Range Curve Fit');
