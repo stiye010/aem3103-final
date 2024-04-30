@@ -49,54 +49,51 @@
         'Higher: Gam = 0.4 rad');
   
  % Second Part: Simultaneous random variations
-    V_range = [2:0.1:7.5];
-    Gam_range = [-0.5:0.1:0.4];
-    tspan = [0:0.01:6];
-    num_simulations = 100;
-    trajectory_data = zeros(num_simulations, length(tspan), 2);
-    figure;
-    hold on; grid on;
-    gray = [0.7 0.7 0.7];
+V_range = [2:0.1:7.5];
+Gam_range = [-0.5:0.1:0.4];
+tspan = [0:0.01:6];
+num_simulations = 100;
+trajectory_data = zeros(num_simulations, length(tspan), 2);
+
+% Arrays to store all trajectories
+all_t_array = zeros(num_simulations, length(tspan));
+all_h_array = zeros(num_simulations, length(tspan));
+all_r_array = zeros(num_simulations, length(tspan));
+
+for i = 1:num_simulations
+    V = V_range(1) + (V_range(end) - V_range(1)) * rand(1);
+    Gam = Gam_range(1) + (Gam_range(end) - Gam_range(1)) * rand(1);
+    [H, R] = setup_sim();
+    xo = [V; Gam; H; R];
+    [ta, xa] = ode23(@EqMotion, tspan, xo);
+    r_array = xa(:,4);
+    h_array = xa(:,3);
+    t_array = ta;
     
-    for i = 1:num_simulations
-        V = V_range(1) + (V_range(end) - V_range(1)) * rand(1);
-        Gam = Gam_range(1) + (Gam_range(end) - Gam_range(1)) * rand(1);
-        [H, R] = setup_sim();
-        xo = [V; Gam; H; R];
-        [ta, xa] = ode23(@EqMotion, tspan, xo);
-        r_array = [xa(:,4)];
-        h_array = [xa(:,3)];
-        t_array = [ta];
-        plot(r_array,h_array, 'Color', gray);
-    end
- 
-    title('Simulated Trajectories with Random Parameter Variations');
-    xlabel('Range (m)');
-    ylabel('Height (m)');
+    % Store trajectories
+    all_t_array(i, :) = t_array';
+    all_h_array(i, :) = h_array';
+    all_r_array(i, :) = r_array';
+end
 
-    % Curve fit
-    figure;
+% Plot all height trajectories
+figure;
+hold on; grid on;
+for i = 1:num_simulations
+    plot(all_r_array(i,:), all_h_array(i,:), 'Color', [0.7 0.7 0.7]);
+end
+title('Simulated Height vs Range Trajectories');
+xlabel('Range (m)');
+ylabel('Height (m)');
 
-    % Height v Time
-    subplot(1,2,1);
-    hold on;grid on;
-    plot(t_array,h_array,'-k');
-    p = polyfit(t_array,h_array,8);
-    h_fit = polyval(p, t_array); 
-    plot(t_array,h_fit, '-b','LineWidth',1);
-    title('Height vs Time');
-    xlabel('Time(s)'); ylabel('Height (m)');
-    legend('Actual', 'Curve Fit')
+% Fit curve to all height trajectories
+p_h = polyfit(all_t_array(:), all_h_array(:), 8);
+h_fit = polyval(p_h, all_t_array(:));
 
-    % Range v Time
-    subplot(1,2,2);
-    hold on;grid on;
-    plot(t_array,r_array,'-k');
-    p = polyfit(t_array,r_array,3);
-    r_fit = polyval(p, t_array); 
-    plot(t_array,r_fit, '-b','LineWidth',1);
-    title('Range vs Time');
-    xlabel('Time(s)'); ylabel('Range (m)');
-    legend('Actual', 'Curve Fit')
+% Fit curve to all range trajectories
+p_r = polyfit(all_t_array(:), all_r_array(:), 3);
+r_fit = polyval(p_r, all_t_array(:));
 
-disp (t_array)
+% Plot height and range curve fits
+plot(r_fit, h_fit, 'k', 'LineWidth', 2);
+legend('Simulated Trajectories', 'Height vs Range Curve Fit');
