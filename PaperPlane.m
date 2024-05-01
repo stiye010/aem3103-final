@@ -49,51 +49,39 @@
         'Higher: Gam = 0.4 rad');
 
 %% Animation
-    figure;
-    subplot(2,1,1);
+    animation_fig = figure;
     hold on; grid on;
     xlabel('Range (m)');
     ylabel('Height (m)');
-    title('Height vs Range : Varying Initial Velocity Animation');
-    
-    V = 3.55;
+    title('Height vs Range');
+    tspan = [0:0.1:6];
+    gifFile = 'Animation.gif';
+    frameDelay = 0.15;
+
+    V = 3.55; Gam = -0.18;
     xo = [V; Gam; H; R];
     [ta_nominal, xa_nominal] = ode23('EqMotion', tspan, xo);
-    V = 7.5;
-    xo = [V; Gam; H; R];
-    [ta_scenario, xa_scenario] = ode23('EqMotion', tspan, xo);
-    h = animatedline('Color', 'k');
-    z = animatedline('Color', 'b');
+    
+    V = 7.5; Gam = 0.4;
+    xo_s = [V; Gam; H; R];
+    [ta_scenario, xa_scenario] = ode23('EqMotion', tspan, xo_s);
+    h = animatedline('Color', 'k', 'LineWidth', 2);
+    z = animatedline('Color', 'b', 'LineWidth', 2);
 
     for j = 1:length(tspan)
         addpoints(h, xa_nominal(j,4), xa_nominal(j,3));
         addpoints(z, xa_scenario(j,4), xa_scenario(j,3));
         drawnow;
         pause(0.001);
-        legend('Nominal: V = 3.55 m/s', 'Scenario: V = 7.5 m/s')
-    end
-    
-    subplot(2,1,2);
-    hold on; grid on;
-    xlabel('Range (m)');
-    ylabel('Height (m)');
-    title('Height vs Range : Varying Initial Flight Path Angle Animation');
-
-    Gam = -0.18;
-    xo = [V; Gam; H; R];
-    [ta_nominal_g, xa_nominal_g] = ode23('EqMotion', tspan, xo);
-    Gam = 0.4;
-    xo = [V; Gam; H; R];
-    [ta_scenario_g, xa_scenario_g] = ode23('EqMotion', tspan, xo);
-    w = animatedline('Color', 'k');
-    q = animatedline('Color', 'b');
-
-    for j = 1:length(tspan)
-        addpoints(w, xa_nominal_g(j,4), xa_nominal_g(j,3));
-        addpoints(q, xa_scenario_g(j,4), xa_scenario_g(j,3));
-        drawnow;
-        pause(0.001);
-        legend('Nominal: Gam = - 0.18 rad', 'Scenario: Gam = 0.4 rad');
+        legend('Nominal: V = 3.55 m/s & Gam = - 0.18 rad', 'Scenario: V = 7.5 m/s & Gam = 0.4 rad')
+        frame = getframe(animation_fig);
+        im = frame2im(frame);
+        [imind, cm] = rgb2ind(im,256);
+        if j == 1
+            imwrite(imind, cm, gifFile, 'gif', 'Loopcount', inf, 'DelayTime', frameDelay);
+        else
+            imwrite(imind, cm, gifFile, 'gif', 'WriteMode', 'append', 'DelayTime', frameDelay);
+        end
     end
 
 %% Part 2 & 3: Simultaneous random variations and Curve fitting
