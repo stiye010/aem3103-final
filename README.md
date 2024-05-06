@@ -35,5 +35,5 @@
   (Below are for teams of 2-3 people)
 
   # Animation
-  ## Point-Mass Animation
+  
   <Animated GIF showing 2D trajectory for nominal and the scenario (V=7.5 m/s, Gam=+0.4 rad)>
