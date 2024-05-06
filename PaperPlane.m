@@ -112,7 +112,7 @@
         all_r_array(i, :) = r_array';
     end
     
-    % Plot all height trajectories
+    % Plot all height and range trajectories
     figure;
     hold on; grid on;
     for i = 1:num_simulations
@@ -127,9 +127,34 @@
     h_fit = polyval(p_h, all_t_array(:));
     
     % Fit curve to all range trajectories
+   
     p_r = polyfit(all_t_array(:), all_r_array(:), 3);
     r_fit = polyval(p_r, all_t_array(:));
     
     % Plot height and range curve fits
     plot(r_fit, h_fit, 'k', 'LineWidth', 2);
     legend('Simulated Trajectories', 'Height vs Range Curve Fit');
+
+    % Time derivative of height using curve fit equation (p_h values)
+    x = tspan;
+    h_der = 8*p_h(1)*x.^7+7*p_h(2)*x.^6+6*p_h(3)*x.^5+5*p_h(4)*x.^4 ...
+    +4*p_h(5)*x.^3+3*p_h(6)*x.^2+2*p_h(7)*x+p_h(8);
+    
+    % Time derivative of range using curve fit equation (p_r values)
+    r_der = 3*p_r(1)*x.^2+2*p_r(2)*x+p_r(3);
+
+    % Plot the time derivatives
+    figure;
+    subplot(2,1,1)
+    hold on; grid on;
+    plot(tspan,h_der);
+    title('Time derivative of Height');
+    xlabel('Time (s)');
+    ylabel('dh/dt (m/s)');
+    
+    subplot(2,1,2)
+    hold on; grid on;
+    plot(tspan,r_der);
+    title('Time derivative of Range');
+    xlabel('Time (s)');
+    ylabel('dr/dt (m/s)');
