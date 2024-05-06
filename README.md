@@ -35,5 +35,5 @@
   (Below are for teams of 2-3 people)
 
   # Animation
-  
-  <Animated GIF showing 2D trajectory for nominal and the scenario (V=7.5 m/s, Gam=+0.4 rad)>
+  ![Animation](https://github.com/stiye010/aem3103-final/assets/167140587/25a0ebf2-61f0-4696-9d7a-1ec301191afb)
+  Animated GIF showing 2D trajectory for nominal and the scenario (V=7.5 m/s, Gam=+0.4 rad)
